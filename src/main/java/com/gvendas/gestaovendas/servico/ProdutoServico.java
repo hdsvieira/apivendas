@@ -50,7 +50,8 @@ public class ProdutoServico {
 		return produto.get();
 	}
 	private void validarProdutoDuplicado(Produto produto) {
-		if(produtoRepositorio.findByCategoriaCodigoAndDescricao(produto.getCategoria().getCodigo(), produto.getDescricao()).isPresent()) {
+		Optional<Produto> produtoPorDescricao = produtoRepositorio.findByCategoriaCodigoAndDescricao(produto.getCategoria().getCodigo(), produto.getDescricao());
+		if(produtoPorDescricao.isPresent() && produtoPorDescricao.get().getCodigo() != produto.getCodigo()) {
 			throw new RegraNegocioException(String.format("O produto %s já está cadastrado.",produto.getDescricao()));
 		}
 	}

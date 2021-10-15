@@ -52,7 +52,7 @@ public class ProdutoControlador {
 	}
 
 	@ApiOperation(value = "Atualizar", nickname = "atualizarProduto")
-	@PutMapping("/{codigo}")
+	@PutMapping("/{codigoProduto}")
 	public ResponseEntity<Produto> atualizar(@PathVariable Long codigoCategoria, @PathVariable Long codigoProduto,
 			@Valid @RequestBody Produto produto) {
 		return ResponseEntity.ok(produtoServico.atualizar(codigoCategoria, codigoProduto, produto));
