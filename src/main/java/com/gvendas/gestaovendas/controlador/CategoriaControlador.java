@@ -45,7 +45,7 @@ public class CategoriaControlador {
 		return categoria.isPresent() ? ResponseEntity.ok(categoria) : ResponseEntity.notFound().build();
 	}
 	
-	@ApiOperation(value = "Salvar", nickname = "salvar")
+	@ApiOperation(value = "Salvar", nickname = "salvarCategoria")
 	@PostMapping
 	public ResponseEntity<Categoria> salvar(@Valid @RequestBody Categoria categoria){
 		Categoria categoriaSalva = categoriaServico.salvar(categoria);
