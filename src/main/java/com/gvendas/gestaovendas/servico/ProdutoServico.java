@@ -35,7 +35,6 @@ public class ProdutoServico {
 	private void validarProdutoDuplicado(Produto produto) {
 		if(produtoRepositorio.findByCategoriaCodigoAndDescricao(produto.getCategoria().getCodigo(), produto.getDescricao()).isPresent()) {
 			throw new RegraNegocioException(String.format("O produto %s já está cadastrado.",produto.getDescricao()));
-			
 		}
 	}
 	
