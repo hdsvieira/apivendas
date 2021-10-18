@@ -58,7 +58,7 @@ public class CategoriaControlador {
 		return ResponseEntity.ok(categoriaServico.atualizar(codigo, categoria));
 	}
 
-	@ApiOperation(value = "Deletar", nickname = "deletar")
+	@ApiOperation(value = "Deletar", nickname = "deletarCategoria")
 	@DeleteMapping("/{codigo}")
 	@ResponseStatus(HttpStatus.NO_CONTENT)
 	public void delete(@PathVariable Long codigo) {

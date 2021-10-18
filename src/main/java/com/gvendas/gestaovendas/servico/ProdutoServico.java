@@ -65,4 +65,10 @@ public class ProdutoServico {
 		}
 	}
 	
+	public void deletar(Long codigoCategoria, Long codigoProduto) {
+		Produto produto = validarProdutoExiste(codigoProduto, codigoCategoria);
+		produtoRepositorio.delete(produto);
+	}
+
+	
 }
