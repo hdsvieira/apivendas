@@ -2,61 +2,50 @@ package com.gvendas.gestaovendas.dto.produto;
 
 import java.math.BigDecimal;
 
-import com.gvendas.gestaovendas.dto.categoria.CategoriaResponseDTO;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
+
+import org.hibernate.validator.constraints.Length;
+
+import com.gvendas.gestaovendas.entidades.Categoria;
 import com.gvendas.gestaovendas.entidades.Produto;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
-@ApiModel("Produto Retorno DTO")
-public class ProdutoResponseDTO {
-
-	@ApiModelProperty(value = "Código")
-	private Long codigo;
+@ApiModel("Produto Requisição DTO")
+public class ProdutoRequestDTO {
 
 	@ApiModelProperty(value = "Descrição")
+
+	@NotBlank(message = "Descrição")
+	@Length(min = 3, max = 100, message = "Descrição")
 	private String descricao;
 
 	@ApiModelProperty(value = "Quantidade")
+	@NotNull(message = "Quantidade")
 	private Integer quantidade;
 
 	@ApiModelProperty(value = "Preço Custo")
+	@NotNull(message = "Preço Custo")
 	private BigDecimal precoCusto;
 
 	@ApiModelProperty(value = "Preço Venda")
+	@NotNull(message = "Preço Venda")
 	private BigDecimal precoVenda;
 
 	@ApiModelProperty(value = "Observação")
+	@Length(max = 500, message = "Observação")
 	private String observacao;
 
-	@ApiModelProperty(value = "categoria")
-	private CategoriaResponseDTO categoria;
-
-	public ProdutoResponseDTO(Long codigo, String descricao, Integer quantidade, BigDecimal precoCusto,
-			BigDecimal precoVenda, String observacao, CategoriaResponseDTO categoria) {
-		this.codigo = codigo;
-		this.descricao = descricao;
-		this.quantidade = quantidade;
-		this.precoCusto = precoCusto;
-		this.precoVenda = precoVenda;
-		this.observacao = observacao;
-		this.categoria = categoria;
+	public Produto converterParaEntidade(Long codigoCategoria) {
+		return new Produto(descricao, quantidade, precoCusto, precoVenda, observacao, new Categoria(codigoCategoria));
 	}
 
-	public static ProdutoResponseDTO convertParaProdutoDTO(Produto produto) {
-		return new ProdutoResponseDTO(produto.getCodigo(), produto.getDescricao(), produto.getQuantidade(),
-				produto.getPrecoCusto(), produto.getPrecoVenda(), produto.getObservacao(),
-				CategoriaResponseDTO.converterParaCategoriaDTO(produto.getCategoria()));
+	public Produto converterParaEntidade(Long codigoCategoria, Long codigoProduto) {
+		return new Produto(codigoProduto, descricao, quantidade, precoCusto, precoVenda, observacao, new Categoria(codigoCategoria));
 	}
-
-	public Long getCodigo() {
-		return codigo;
-	}
-
-	public void setCodigo(Long codigo) {
-		this.codigo = codigo;
-	}
-
+	
 	public String getDescricao() {
 		return descricao;
 	}
@@ -95,14 +84,6 @@ public class ProdutoResponseDTO {
 
 	public void setObservacao(String observacao) {
 		this.observacao = observacao;
-	}
-
-	public CategoriaResponseDTO getCategoria() {
-		return categoria;
-	}
-
-	public void setCategoria(CategoriaResponseDTO categoria) {
-		this.categoria = categoria;
 	}
 
 }

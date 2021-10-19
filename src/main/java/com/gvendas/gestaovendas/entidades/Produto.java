@@ -11,10 +11,6 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
-
-import org.hibernate.validator.constraints.Length;
 
 @Entity
 @Table(name = "produto")
@@ -23,32 +19,49 @@ public class Produto {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "codigo")
 	private Long codigo;
-	
+
 	@Column(name = "descricao")
-	@NotBlank(message = "Descrição")
-	@Length(min=3, max=100,message = "Descrição")
 	private String descricao;
-	
+
 	@Column(name = "quantidade")
-	@NotNull(message = "Quantidade")
 	private Integer quantidade;
-	
+
 	@Column(name = "preco_curto")
-	@NotNull(message = "Preço Custo")
 	private BigDecimal precoCusto;
-	
+
 	@Column(name = "preco_venda")
-	@NotNull(message = "Preço Venda")
 	private BigDecimal precoVenda;
-	
+
 	@Column(name = "observacao")
-	@Length(max=500,message = "Observação")
 	private String observacao;
-	
-	@NotNull(message = "Código categoria")
+
 	@ManyToOne
 	@JoinColumn(name = "codigo_categoria", referencedColumnName = "codigo")
 	private Categoria categoria;
+
+	public Produto() {
+	}
+
+	public Produto(String descricao, Integer quantidade, BigDecimal precoCusto, BigDecimal precoVenda,
+			String observacao, Categoria categoria) {
+		this.descricao = descricao;
+		this.quantidade = quantidade;
+		this.precoCusto = precoCusto;
+		this.precoVenda = precoVenda;
+		this.observacao = observacao;
+		this.categoria = categoria;
+	}
+
+	public Produto(Long codigo, String descricao, Integer quantidade, BigDecimal precoCusto, BigDecimal precoVenda,
+			String observacao, Categoria categoria) {
+		this.codigo = codigo;
+		this.descricao = descricao;
+		this.quantidade = quantidade;
+		this.precoCusto = precoCusto;
+		this.precoVenda = precoVenda;
+		this.observacao = observacao;
+		this.categoria = categoria;
+	}
 
 	public Long getCodigo() {
 		return codigo;
@@ -125,7 +138,5 @@ public class Produto {
 				&& Objects.equals(precoCusto, other.precoCusto) && Objects.equals(precoVenda, other.precoVenda)
 				&& Objects.equals(quantidade, other.quantidade);
 	}
-	
-	
 
 }
