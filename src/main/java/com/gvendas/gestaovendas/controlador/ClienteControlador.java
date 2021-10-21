@@ -2,6 +2,7 @@ package com.gvendas.gestaovendas.controlador;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -10,6 +11,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.gvendas.gestaovendas.dto.cliente.ClienteResponseDTO;
 import com.gvendas.gestaovendas.entidades.Cliente;
 import com.gvendas.gestaovendas.servico.ClienteServico;
 
@@ -24,17 +26,19 @@ public class ClienteControlador {
 	@Autowired
 	private ClienteServico clienteServico;
 
-	@ApiOperation(value = "Listar", nickname = "listarTodos")
+	@ApiOperation(value = "Listar", nickname = "listarTodosClientes")
 	@GetMapping
-	public List<Cliente> listarTodos() {
-		return clienteServico.listarTodos();
+	public List<ClienteResponseDTO> listarTodos() {
+		return clienteServico.listarTodos().stream().map(cliente -> ClienteResponseDTO.convertParaClienteDTO(cliente))
+				.collect(Collectors.toList());
 	}
 
-	@ApiOperation(value = "Listar por código", nickname = "buscarPorId")
+	@ApiOperation(value = "Listar por código", nickname = "buscarClientePorId")
 	@GetMapping("/{codigo}")
-	public ResponseEntity<Cliente> buscarPorId(@PathVariable(name = "codigo") Long codigo) {
+	public ResponseEntity<ClienteResponseDTO> buscarPorId(@PathVariable(name = "codigo") Long codigo) {
 		Optional<Cliente> cliente = clienteServico.buscarPorCodigo(codigo);
-		return cliente.isPresent() ? ResponseEntity.ok(cliente.get()) : ResponseEntity.notFound().build();
+		return cliente.isPresent() ? ResponseEntity.ok(ClienteResponseDTO.convertParaClienteDTO(cliente.get()))
+				: ResponseEntity.notFound().build();
 	}
 
 }
