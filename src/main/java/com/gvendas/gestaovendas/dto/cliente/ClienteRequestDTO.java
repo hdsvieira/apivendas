@@ -73,5 +73,12 @@ public class ClienteRequestDTO {
 				enderecoDto.getEstado());
 		return new Cliente(nome, telefone, ativo, endereco);
 	}
+	
+	public Cliente converterParaEntidade(Long codigo) {
+		Endereco endereco = new Endereco(enderecoDto.getLogradouro(), enderecoDto.getNumero(),
+				enderecoDto.getComplemento(), enderecoDto.getBairro(), enderecoDto.getCep(), enderecoDto.getCidade(),
+				enderecoDto.getEstado());
+		return new Cliente(codigo, nome, telefone, ativo, endereco);
+	}
 
 }

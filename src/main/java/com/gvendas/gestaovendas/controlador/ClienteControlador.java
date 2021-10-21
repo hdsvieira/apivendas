@@ -12,6 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -54,4 +55,10 @@ public class ClienteControlador {
 		return ResponseEntity.status(HttpStatus.CREATED).body(ClienteResponseDTO.convertParaClienteDTO(clienteSalvo));
 	}
 
+	@ApiOperation(value = "Atualizar Cliente", nickname = "atualizarCliente")
+	@PutMapping("/{codigo}")
+	public ResponseEntity<ClienteResponseDTO> atualizar(@PathVariable(name = "codigo") Long codigo,@Valid @RequestBody ClienteRequestDTO clienteDto) {
+		Cliente clienteAtualizar = clienteServico.atualizar(codigo, clienteDto.converterParaEntidade(codigo));
+		return ResponseEntity.status(HttpStatus.CREATED).body(ClienteResponseDTO.convertParaClienteDTO(clienteAtualizar));
+	}
 }
