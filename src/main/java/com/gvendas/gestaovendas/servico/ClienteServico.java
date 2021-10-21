@@ -53,5 +53,8 @@ public class ClienteServico {
 		return cliente.get();
 	}
 	
+	public void deletar(Long codigo) {
+		clienteRepositorio.deleteById(codigo);
+	}
 	
 }
