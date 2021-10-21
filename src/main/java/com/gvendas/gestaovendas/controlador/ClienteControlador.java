@@ -4,6 +4,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import javax.validation.Valid;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -47,7 +49,7 @@ public class ClienteControlador {
 
 	@ApiOperation(value = "Salvar", nickname = "salvarCliente")
 	@PostMapping
-	public ResponseEntity<ClienteResponseDTO> salvar(@RequestBody ClienteRequestDTO clienteDto) {
+	public ResponseEntity<ClienteResponseDTO> salvar(@Valid @RequestBody ClienteRequestDTO clienteDto) {
 		Cliente clienteSalvo = clienteServico.salvar(clienteDto.converterParaEntidade());
 		return ResponseEntity.status(HttpStatus.CREATED).body(ClienteResponseDTO.convertParaClienteDTO(clienteSalvo));
 	}
