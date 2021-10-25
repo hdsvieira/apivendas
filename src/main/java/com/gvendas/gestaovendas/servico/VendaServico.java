@@ -19,7 +19,7 @@ import com.gvendas.gestaovendas.repositorio.ItemVendaRepositorio;
 import com.gvendas.gestaovendas.repositorio.VendaRepositorio;
 
 @Service
-public class VendaServico {
+public class VendaServico extends AbstractVendaServico {
 
 	private ClienteServico clienteServico;
 	private VendaRepositorio vendaRepositorio;
@@ -36,13 +36,14 @@ public class VendaServico {
 	public ClienteVendaResponseDTO listaVendaPorCliente(Long codigoCliente) {
 		Cliente cliente = validarClienteVendaExiste(codigoCliente);
 		List<VendaResponseDTO> vendaResponseDtoList = vendaRepositorio.findByClienteCodigo(codigoCliente).stream()
-				.map(this::criandoVendaResponseDTO).collect(Collectors.toList());
+				.map(venda -> criandoVendaResponseDTO(venda, itemVendaRepositorio.findByVendaCodigo(venda.getCodigo()))).collect(Collectors.toList());
 		return new ClienteVendaResponseDTO(cliente.getNome(), vendaResponseDtoList);
 	}
 
 	public ClienteVendaResponseDTO listarVendaPorCodigo(Long codigoVenda) {
 		Venda venda = validarVendaExiste(codigoVenda);
-		VendaResponseDTO vendaEncontrada = criandoVendaResponseDTO(venda);
+		List<ItemVenda> itensVendaList = itemVendaRepositorio.findByVendaCodigo(venda.getCodigo());
+		VendaResponseDTO vendaEncontrada = criandoVendaResponseDTO(venda, itensVendaList);
 		return new ClienteVendaResponseDTO(venda.getCliente().getNome(), Arrays.asList(vendaEncontrada));
 	}
 
@@ -62,18 +63,6 @@ public class VendaServico {
 					String.format("O Cliente de código %s informado não existe no cadastro.", codigoCliente));
 		}
 		return cliente.get();
-	}
-
-	private VendaResponseDTO criandoVendaResponseDTO(Venda venda) {
-		List<ItemVendaResponseDTO> itensVendaResponseDto = itemVendaRepositorio.findByVendaCodigo(venda.getCodigo())
-				.stream().map(this::criandoItensVendaResponseDTO).collect(Collectors.toList());
-		return new VendaResponseDTO(venda.getCodigo(), venda.getData(), itensVendaResponseDto);
-
-	}
-
-	private ItemVendaResponseDTO criandoItensVendaResponseDTO(ItemVenda itemVenda) {
-		return new ItemVendaResponseDTO(itemVenda.getCodigo(), itemVenda.getQuantidade(), itemVenda.getPrecoVendido(),
-				itemVenda.getProduto().getCodigo(), itemVenda.getProduto().getDescricao());
 	}
 
 }
