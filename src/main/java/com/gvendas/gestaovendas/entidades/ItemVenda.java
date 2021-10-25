@@ -35,6 +35,16 @@ public class ItemVenda {
 	@Column(name = "preco_vendido")
 	private BigDecimal precoVendido;
 
+	public ItemVenda() {
+	}
+
+	public ItemVenda(Produto produto, Venda venda, Integer quantidade, BigDecimal precoVendido) {
+		this.produto = produto;
+		this.venda = venda;
+		this.quantidade = quantidade;
+		this.precoVendido = precoVendido;
+	}
+
 	public Long getCodigo() {
 		return codigo;
 	}
