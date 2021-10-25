@@ -23,6 +23,7 @@ public class GestaoVendasTratamentoExcecao extends ResponseEntityExceptionHandle
 	private static final String CONSTANT_VALIDATION_NOT_NULL = "NotNull";
 	private static final String CONSTANT_VALIDATION_LENGTH = "Length";
 	private static final String CONSTANT_VALIDATION_PATTERN = "Pattern";
+	private static final String CONSTANT_VALIDATION_MIN = "Min";
 
 	@Override
 	protected ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException ex,
@@ -32,9 +33,10 @@ public class GestaoVendasTratamentoExcecao extends ResponseEntityExceptionHandle
 
 		return handleExceptionInternal(ex, erros, headers, HttpStatus.BAD_REQUEST, request);
 	}
-	
+
 	@ExceptionHandler(EmptyResultDataAccessException.class)
-	public ResponseEntity<Object> handleEmptyResultDataAccessException(EmptyResultDataAccessException ex, WebRequest request){
+	public ResponseEntity<Object> handleEmptyResultDataAccessException(EmptyResultDataAccessException ex,
+			WebRequest request) {
 		String msgUsuario = "Recurso não encontrado.";
 		String msgDesenvolvedor = ex.toString();
 		List<Erro> erros = Arrays.asList(new Erro(msgUsuario, msgDesenvolvedor));
@@ -65,20 +67,25 @@ public class GestaoVendasTratamentoExcecao extends ResponseEntityExceptionHandle
 		if (fieldError.getCode().equals(CONSTANT_VALIDATION_PATTERN)) {
 			return fieldError.getDefaultMessage().concat(" formato inválido.");
 		}
+		if (fieldError.getCode().equals(CONSTANT_VALIDATION_MIN)) {
+			return fieldError.getDefaultMessage()
+					.concat(String.format(" deve ser maior ou igual a %s.", fieldError.getArguments()[1]));
+		}
 		return fieldError.toString();
 	}
-	
+
 	@ExceptionHandler(RegraNegocioException.class)
-	public ResponseEntity<Object> handleRegraNegocioException(RegraNegocioException ex, WebRequest request){
+	public ResponseEntity<Object> handleRegraNegocioException(RegraNegocioException ex, WebRequest request) {
 		String msgUsuario = ex.getMessage();
 		String msgDesenvolvedor = ex.getMessage();
 		List<Erro> erros = Arrays.asList(new Erro(msgUsuario, msgDesenvolvedor));
 		return handleExceptionInternal(ex, erros, new HttpHeaders(), HttpStatus.BAD_REQUEST, request);
-	
+
 	}
-	
+
 	@ExceptionHandler(DataIntegrityViolationException.class)
-	public ResponseEntity<Object> handleDataIntegrityViolationException(DataIntegrityViolationException ex, WebRequest request){
+	public ResponseEntity<Object> handleDataIntegrityViolationException(DataIntegrityViolationException ex,
+			WebRequest request) {
 		String msgUsuario = "Recurso não encontrado.";
 		String msgDesenvolvedor = ex.toString();
 		List<Erro> erros = Arrays.asList(new Erro(msgUsuario, msgDesenvolvedor));
