@@ -10,7 +10,6 @@ import org.springframework.stereotype.Service;
 
 import com.gvendas.gestaovendas.dto.venda.ClienteVendaResponseDTO;
 import com.gvendas.gestaovendas.dto.venda.ItemVendaRequestDTO;
-import com.gvendas.gestaovendas.dto.venda.ItemVendaResponseDTO;
 import com.gvendas.gestaovendas.dto.venda.VendaRequestDTO;
 import com.gvendas.gestaovendas.dto.venda.VendaResponseDTO;
 import com.gvendas.gestaovendas.entidades.Cliente;
@@ -41,14 +40,14 @@ public class VendaServico extends AbstractVendaServico {
 	public ClienteVendaResponseDTO listaVendaPorCliente(Long codigoCliente) {
 		Cliente cliente = validarClienteVendaExiste(codigoCliente);
 		List<VendaResponseDTO> vendaResponseDtoList = vendaRepositorio.findByClienteCodigo(codigoCliente).stream()
-				.map(venda -> criandoVendaResponseDTO(venda, itemVendaRepositorio.findByVendaCodigo(venda.getCodigo())))
+				.map(venda -> criandoVendaResponseDTO(venda, itemVendaRepositorio.findByVendaPorCodigo(venda.getCodigo())))
 				.collect(Collectors.toList());
 		return new ClienteVendaResponseDTO(cliente.getNome(), vendaResponseDtoList);
 	}
 
 	public ClienteVendaResponseDTO listarVendaPorCodigo(Long codigoVenda) {
 		Venda venda = validarVendaExiste(codigoVenda);
-		List<ItemVenda> itensVendaList = itemVendaRepositorio.findByVendaCodigo(venda.getCodigo());
+		List<ItemVenda> itensVendaList = itemVendaRepositorio.findByVendaPorCodigo(venda.getCodigo());
 		VendaResponseDTO vendaEncontrada = criandoVendaResponseDTO(venda, itensVendaList);
 		return new ClienteVendaResponseDTO(venda.getCliente().getNome(), Arrays.asList(vendaEncontrada));
 	}
@@ -75,7 +74,7 @@ public class VendaServico extends AbstractVendaServico {
 		Cliente cliente = validarClienteVendaExiste(codigoCliente);
 		validarProdutoExiste(vendaDto.getItensVendaDto());
 		Venda vendaSalva = salvarVenda(cliente, vendaDto);
-		List<ItemVenda> itensVendaList = itemVendaRepositorio.findByVendaCodigo(vendaSalva.getCodigo());
+		List<ItemVenda> itensVendaList = itemVendaRepositorio.findByVendaPorCodigo(vendaSalva.getCodigo());
 		VendaResponseDTO vendaEncontrada = criandoVendaResponseDTO(vendaSalva, itensVendaList);
 		return new ClienteVendaResponseDTO(vendaSalva.getCliente().getNome(), Arrays.asList(vendaEncontrada));
 	}

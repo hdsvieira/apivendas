@@ -45,6 +45,14 @@ public class ItemVenda {
 		this.precoVendido = precoVendido;
 	}
 
+	public ItemVenda(Long codigo, Produto produto, Venda venda, Integer quantidade, BigDecimal precoVendido) {
+		this.codigo = codigo;
+		this.produto = produto;
+		this.venda = venda;
+		this.quantidade = quantidade;
+		this.precoVendido = precoVendido;
+	}
+
 	public Long getCodigo() {
 		return codigo;
 	}
