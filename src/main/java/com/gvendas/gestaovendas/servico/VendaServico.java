@@ -13,6 +13,7 @@ import com.gvendas.gestaovendas.dto.venda.VendaRequestDTO;
 import com.gvendas.gestaovendas.dto.venda.VendaResponseDTO;
 import com.gvendas.gestaovendas.entidades.Cliente;
 import com.gvendas.gestaovendas.entidades.ItemVenda;
+import com.gvendas.gestaovendas.entidades.Produto;
 import com.gvendas.gestaovendas.entidades.Venda;
 import com.gvendas.gestaovendas.excecao.RegraNegocioException;
 import com.gvendas.gestaovendas.repositorio.ItemVendaRepositorio;
@@ -70,14 +71,25 @@ public class VendaServico extends AbstractVendaServico {
 
 	public ClienteVendaResponseDTO salvar(Long codigoCliente, VendaRequestDTO vendaDto) {
 		Cliente cliente = validarClienteVendaExiste(codigoCliente);
-		validarProdutoExiste(vendaDto.getItensVendaDto());
+		validarProdutoExisteEAtualizarQuantidade(vendaDto.getItensVendaDto());
 		Venda vendaSalva = salvarVenda(cliente, vendaDto);
 		List<ItemVenda> itensVendaList = itemVendaRepositorio.findByVendaPorCodigo(vendaSalva.getCodigo());
 		return retornandoClienteVendaResponseDTO(vendaSalva, itensVendaList);
 	}
 
-	private void validarProdutoExiste(List<ItemVendaRequestDTO> itensVendaDto) {
-		itensVendaDto.forEach(item -> produtoServico.validarProdutoExiste(item.getCodigoProduto()));
+	private void validarProdutoExisteEAtualizarQuantidade(List<ItemVendaRequestDTO> itensVendaDto) {
+		itensVendaDto.forEach(item -> {
+			Produto produto = produtoServico.validarProdutoExiste(item.getCodigoProduto());
+			validarQuantidadeProdutoExiste(produto, item.getQuantidade());
+			produto.setQuantidade(produto.getQuantidade()-item.getQuantidade());
+			produtoServico.atualizarQuantidadeAposVenda(produto);
+		});
+	}
+	private void validarQuantidadeProdutoExiste(Produto produto, Integer qtdeVendaDto) {
+		if(!(produto.getQuantidade() >= qtdeVendaDto)) {
+			throw new RegraNegocioException(String.format("A quantidade %s informada para o produto %s não está disponível em estoque",
+					qtdeVendaDto, produto.getDescricao()));
+		}
 	}
 
 	private Venda salvarVenda(Cliente cliente, VendaRequestDTO vendaDto) {
