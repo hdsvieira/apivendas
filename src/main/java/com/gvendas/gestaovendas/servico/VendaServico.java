@@ -1,6 +1,5 @@
 package com.gvendas.gestaovendas.servico;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -14,7 +13,6 @@ import com.gvendas.gestaovendas.dto.venda.VendaRequestDTO;
 import com.gvendas.gestaovendas.dto.venda.VendaResponseDTO;
 import com.gvendas.gestaovendas.entidades.Cliente;
 import com.gvendas.gestaovendas.entidades.ItemVenda;
-import com.gvendas.gestaovendas.entidades.Produto;
 import com.gvendas.gestaovendas.entidades.Venda;
 import com.gvendas.gestaovendas.excecao.RegraNegocioException;
 import com.gvendas.gestaovendas.repositorio.ItemVendaRepositorio;
@@ -48,10 +46,10 @@ public class VendaServico extends AbstractVendaServico {
 	public ClienteVendaResponseDTO listarVendaPorCodigo(Long codigoVenda) {
 		Venda venda = validarVendaExiste(codigoVenda);
 		List<ItemVenda> itensVendaList = itemVendaRepositorio.findByVendaPorCodigo(venda.getCodigo());
-		VendaResponseDTO vendaEncontrada = criandoVendaResponseDTO(venda, itensVendaList);
-		return new ClienteVendaResponseDTO(venda.getCliente().getNome(), Arrays.asList(vendaEncontrada));
+		return retornandoClienteVendaResponseDTO(venda, itensVendaList);
+		
 	}
-
+	
 	private Venda validarVendaExiste(Long codigoVenda) {
 		Optional<Venda> venda = vendaRepositorio.findById(codigoVenda);
 		if (venda.isEmpty()) {
@@ -75,8 +73,7 @@ public class VendaServico extends AbstractVendaServico {
 		validarProdutoExiste(vendaDto.getItensVendaDto());
 		Venda vendaSalva = salvarVenda(cliente, vendaDto);
 		List<ItemVenda> itensVendaList = itemVendaRepositorio.findByVendaPorCodigo(vendaSalva.getCodigo());
-		VendaResponseDTO vendaEncontrada = criandoVendaResponseDTO(vendaSalva, itensVendaList);
-		return new ClienteVendaResponseDTO(vendaSalva.getCliente().getNome(), Arrays.asList(vendaEncontrada));
+		return retornandoClienteVendaResponseDTO(vendaSalva, itensVendaList);
 	}
 
 	private void validarProdutoExiste(List<ItemVendaRequestDTO> itensVendaDto) {
@@ -88,11 +85,6 @@ public class VendaServico extends AbstractVendaServico {
 		vendaDto.getItensVendaDto().stream().map(itemVendaDto -> criandoItemVenda(itemVendaDto, vendaSalva))
 				.forEach(itemVendaRepositorio::save);
 		return vendaSalva;
-	}
-
-	private ItemVenda criandoItemVenda(ItemVendaRequestDTO itemVendaDto, Venda venda) {
-		return new ItemVenda(new Produto(itemVendaDto.getCodigoProduto()), venda, itemVendaDto.getQuantidade(),
-				itemVendaDto.getPrecoVendido());
 	}
 
 }
