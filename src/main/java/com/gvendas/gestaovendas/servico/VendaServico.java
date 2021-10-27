@@ -4,7 +4,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
@@ -21,7 +20,6 @@ import com.gvendas.gestaovendas.entidades.Venda;
 import com.gvendas.gestaovendas.excecao.RegraNegocioException;
 import com.gvendas.gestaovendas.repositorio.ItemVendaRepositorio;
 import com.gvendas.gestaovendas.repositorio.VendaRepositorio;
-
 
 @Service
 public class VendaServico extends AbstractVendaServico {
@@ -42,8 +40,8 @@ public class VendaServico extends AbstractVendaServico {
 
 	public ClienteVendaResponseDTO listaVendaPorCliente(Long codigoCliente) {
 		Cliente cliente = validarClienteVendaExiste(codigoCliente);
-		List<VendaResponseDTO> vendaResponseDtoList = vendaRepositorio.findByClienteCodigo(codigoCliente).stream()
-				.map(venda -> criandoVendaResponseDTO(venda, itemVendaRepositorio.findByVendaPorCodigo(venda.getCodigo())))
+		List<VendaResponseDTO> vendaResponseDtoList = vendaRepositorio.findByClienteCodigo(codigoCliente).stream().map(
+				venda -> criandoVendaResponseDTO(venda, itemVendaRepositorio.findByVendaPorCodigo(venda.getCodigo())))
 				.collect(Collectors.toList());
 		return new ClienteVendaResponseDTO(cliente.getNome(), vendaResponseDtoList);
 	}
@@ -52,9 +50,9 @@ public class VendaServico extends AbstractVendaServico {
 		Venda venda = validarVendaExiste(codigoVenda);
 		List<ItemVenda> itensVendaList = itemVendaRepositorio.findByVendaPorCodigo(venda.getCodigo());
 		return retornandoClienteVendaResponseDTO(venda, itensVendaList);
-		
+
 	}
-	
+
 	private Venda validarVendaExiste(Long codigoVenda) {
 		Optional<Venda> venda = vendaRepositorio.findById(codigoVenda);
 		if (venda.isEmpty()) {
@@ -82,18 +80,37 @@ public class VendaServico extends AbstractVendaServico {
 		return retornandoClienteVendaResponseDTO(vendaSalva, itensVendaList);
 	}
 
+	@Transactional(propagation = Propagation.REQUIRED, readOnly = false, rollbackFor = Exception.class)
+	public void deletar(Long codigoVenda) {
+		Venda venda = validarVendaExiste(codigoVenda);
+		List<ItemVenda> itensVenda = itemVendaRepositorio.findByVendaPorCodigo(codigoVenda);
+		validarProdutoExisteEDevolverEstoque(itensVenda);
+		itemVendaRepositorio.deleteAll(itensVenda);
+		vendaRepositorio.deleteById(codigoVenda);
+	}
+
+	private void validarProdutoExisteEDevolverEstoque(List<ItemVenda> itensVenda) {
+		itensVenda.forEach(item -> {
+			Produto produto = produtoServico.validarProdutoExiste(item.getProduto().getCodigo());
+			produto.setQuantidade(produto.getQuantidade() + item.getQuantidade());
+			produtoServico.atualizarQuantidadeEmEstoque(produto);
+		});
+	}
+
 	private void validarProdutoExisteEAtualizarQuantidade(List<ItemVendaRequestDTO> itensVendaDto) {
 		itensVendaDto.forEach(item -> {
 			Produto produto = produtoServico.validarProdutoExiste(item.getCodigoProduto());
 			validarQuantidadeProdutoExiste(produto, item.getQuantidade());
-			produto.setQuantidade(produto.getQuantidade()-item.getQuantidade());
-			produtoServico.atualizarQuantidadeAposVenda(produto);
+			produto.setQuantidade(produto.getQuantidade() - item.getQuantidade());
+			produtoServico.atualizarQuantidadeEmEstoque(produto);
 		});
 	}
+
 	private void validarQuantidadeProdutoExiste(Produto produto, Integer qtdeVendaDto) {
-		if(!(produto.getQuantidade() >= qtdeVendaDto)) {
-			throw new RegraNegocioException(String.format("A quantidade %s informada para o produto %s não está disponível em estoque",
-					qtdeVendaDto, produto.getDescricao()));
+		if (!(produto.getQuantidade() >= qtdeVendaDto)) {
+			throw new RegraNegocioException(
+					String.format("A quantidade %s informada para o produto %s não está disponível em estoque",
+							qtdeVendaDto, produto.getDescricao()));
 		}
 	}
 
